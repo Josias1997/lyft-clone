@@ -1,20 +1,46 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useCallback } from "react";
+import { NativeBaseProvider } from "native-base";
+import { View } from "react-native";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import RootNavigator from "./src/navigation/RootNavigator";
+import { NavigationContainer } from "@react-navigation/native";
 
-export default function App() {
+const App = () => {
+  const [fontsLoaded] = useFonts({
+    "lyftpro-bold": require("./assets/fonts/lyftpro-bold.ttf"),
+    "lyftpro-light": require("./assets/fonts/lyftpro-light.ttf"),
+    "lyftpro-medium": require("./assets/fonts/lyftpro-medium.ttf"),
+    "lyftpro-semibold": require("./assets/fonts/lyftpro-semibold.ttf"),
+    "proximanova-bold": require("./assets/fonts/proximanova-bold.ttf"),
+    "proximanova-medium": require("./assets/fonts/proximanova-medium.ttf"),
+    "proximanova-regular": require("./assets/fonts/proximanova-regular.ttf"),
+  });
+  useEffect(() => {
+    (async () => {
+      await SplashScreen.preventAutoHideAsync();
+    })();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NativeBaseProvider>
+      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </View>
+    </NativeBaseProvider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
